@@ -16,7 +16,7 @@ const registerUser = asyncHandler(async(req,res)=>{
     // return response
 
     const {fullName,email,username,password}=req.body
-    console.log("email: ",email);
+    // console.log("email: ",email);
 
     // if(fullName===""){
     //     throw new Apierror(400,"fullname is required")
@@ -27,7 +27,7 @@ const registerUser = asyncHandler(async(req,res)=>{
         throw new Apierror(400,"All fields are required")
     }
 
-    const existeduser = User.findOne({
+    const existeduser = await User.findOne({
         $or:[{username},{email}]
     })
 
@@ -35,8 +35,17 @@ const registerUser = asyncHandler(async(req,res)=>{
         throw new Apierror(409,"User with email or username already exists")
     }
 
+    // console.log(req.files);
+    
+
     const avatarlocalpath = req.files?.avatar[0]?.path
-    const coverImagelocalpath = req.files?.coverImage[0]?.path
+    // const coverImagelocalpath = req.files?.coverImage[0]?.path
+
+    let coverImagelocalpath
+    if (req.files && Array.isArray(req.files.coverImage)
+    && req.files.coverImage.length>0) {
+        coverImagelocalpath = req.files.coverImage[0].path
+    }
 
     if(!avatarlocalpath){
         throw new Apierror(400,"Avatar file is required")
@@ -49,7 +58,7 @@ const registerUser = asyncHandler(async(req,res)=>{
         throw new Apierror(400,"Avatar file is required")
     }
     
-    const user = User.create({
+    const user = await User.create({
         fullName,
         avatar:avatar.url,
         coverImage:coverImage?.url || "",
