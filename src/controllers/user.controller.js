@@ -154,11 +154,11 @@ const loginUser = asyncHandler(async(req,res)=>{
 })
 
 const logoutUser = asyncHandler(async(req,res)=>{
-    User.findByIdAndUpdate(
+    await User.findByIdAndUpdate(
         req.user._id,
         {
-            $set:{
-                refreshToken:undefined
+            $unset:{
+                refreshToken:1 // remove the field from document
             }
         },
         {
@@ -409,7 +409,7 @@ const getwatchhistory = asyncHandler(async(req,res)=>{
         },
         {
             $lookup:{
-                from:"Video",
+                from:"video",
                 localField:"watchHistory",
                 foreignField:"_id",
                 as:"watchHistory",
